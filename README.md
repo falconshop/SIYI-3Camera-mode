@@ -123,7 +123,7 @@ MediaMTX는 GStreamer가 영상을 '푸시(보내기)'하고, 지상제어스테
     tar -xvzf mediamtx_v1.6.0_linux_armv7.tar.gz
 
 ## 3. 비디오 파이프라인 스크립트
-두 영상을 하나로 합치는 SBS(Side-by-Side) 병합 처리를 위한 스크립트를 생성합니다. 지상제어스테이션(GCS)에서 /main.264 경로를 검색하므로 해당 경로를 사용합니다. 아래와 같이 셸 스크립트를 작성하십시오.
+두 영상을 하나로 합치는 SBS(Side-by-Side) 병합 처리를 위한 스크립트를 생성합니다. 지상제어스테이션(GCS)에서 /main.264 경로를 검색하므로 해당 경로를 사용합니다. 아래와 같이 셸 스크립트를 작성하십시오. (또는 [다운로드](<https://github.com/falconshop/SIYI-3Camera-mode/blob/main/start_video_merge.sh>) )
 
     nano ~/start_video_merge.sh
 
