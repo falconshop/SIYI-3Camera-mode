@@ -123,7 +123,7 @@ MediaMTX는 GStreamer가 영상을 '푸시(보내기)'하고, 지상제어스테
     tar -xvzf mediamtx_v1.6.0_linux_armv7.tar.gz
 
 ## 3. 비디오 파이프라인 스크립트
-두 영상을 하나로 합치는 SBS(Side-by-Side) 병합 처리를 위한 스크립트를 생성합니다. 지상제어스테이션(GCS)에서 /video1 경로를 검색하므로 해당 경로를 사용합니다. 아래와 같이 셸 스크립트를 작성하십시오.
+두 영상을 하나로 합치는 SBS(Side-by-Side) 병합 처리를 위한 스크립트를 생성합니다. 지상제어스테이션(GCS)에서 /main.264 경로를 검색하므로 해당 경로를 사용합니다. 아래와 같이 셸 스크립트를 작성하십시오.
 
     nano ~/start_video_merge.sh
 
@@ -156,7 +156,7 @@ MediaMTX는 GStreamer가 영상을 '푸시(보내기)'하고, 지상제어스테
     v4l2h264enc extra-controls='controls,video_bitrate=1200000,h264_i_frame_period=15' ! \
     'video/x-h264,level=(string)4,profile=baseline' ! \
     h264parse config-interval=1 ! \
-    rtspclientsink location=rtsp://127.0.0.1:8554/video1 protocols=tcp"
+    rtspclientsink location=rtsp://127.0.0.1:8554/main.264 protocols=tcp"
 
     # 4. Build Camera 1 Branch
     if [ $CAM1_ONLINE -eq 0 ]; then
@@ -317,4 +317,11 @@ B. Video Merge Service
 
 
 # SIYI UniRC7 설정
-작성 중...
+UniGCS 앱의 카메라 설정에서 Camera1 과 Camera2 를 아래 사진과 같이 설정합니다. 
+
+<img src="https://github.com/falconshop/SIYI-3Camera-mode/blob/main/UniRC7-Camera-Select.jpg" alt="UniRC7 Camera Select" width="33%">
+
+# 이제 3개의 영상이 동시에 전송됩니다.
+
+![Complete](https://github.com/falconshop/SIYI-3Camera-mode/blob/main/Complete.jpg)
+
