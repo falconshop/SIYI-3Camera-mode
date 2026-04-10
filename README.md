@@ -65,31 +65,34 @@ A2 Mini 카메라 2개의 IP 주소를 각각 23, 24 로 변경해야 합니다.
 IP 변경 툴 파일을 RaspberryPi 에 넣고, IP 주소를 변경할 SIYI A2 Mini 카메라를 LAN 케이블을 이용해서 RaspberryPi 에 연결합니다. 그리고 RaspberryPi 및 A2 Mini 카메라에 전원을 공급합니다. 
 
 위의 IP 변경 툴 파일은 아래와 같이 사용합니다.
-> python3 set_siyi_ip.py -t 변경전 IP 주소 -n 새로운 IP 주소
+
+    python3 set_siyi_ip.py -t 변경전 IP 주소 -n 새로운 IP 주소
 
 SIYI A2 Mini 카메라의 기본 IP 주소는 192.168.144.25 이므로, 다음과 같이 입력하여 IP 를 변경합니다.
 
-* 1번 카메라 : 
-> python3 set_siyi_ip.py -t 192.168.144.25 -n 192.168.144.23
+1번 카메라 :
 
-* 2번 카메라 : 
-> python3 set_siyi_ip.py -t 192.168.144.25 -n 192.168.144.24
+    python3 set_siyi_ip.py -t 192.168.144.25 -n 192.168.144.23
+
+2번 카메라 : 
+
+    python3 set_siyi_ip.py -t 192.168.144.25 -n 192.168.144.24
 
 
 
 ## SIYI HDMI to IP Converter : IP 변경
 상세 이미지가 있는 전체 매뉴얼은 [이 링크](<https://siyi.biz/siyi_file/Sky%20end%20card%20HDMI/Air%20Unit%20HDMI%20Converter%20User%20Manual_En%20v1.0.pdf>) 를 참고하세요.
 MicroSD 카드에 setup.txt 파일을 생성합니다. 파일 내용은 아래와 같이 작성합니다.
->[NET_CONFIG]
->
->IP = 192.168.144.26
+
+    [NET_CONFIG]
+    IP = 192.168.144.26
 
 작성한 파일을 SD 카드에 저장하고 IP Converter 에 삽입합니다. 그리고 IP Converter 에 전원을 넣고 약 5분 정도 기다립니다.
 
 IP 가 제대로 변경되었는지 확인하기 위해 SD 카드를 빼서 확인합니다. curip.txt 파일이 자동으로 생성되어 있으며, 해당 파일에 아래와 같이 변경된 IP 주소가 적혀있으면 정상적으로 변경된 것입니다.
->[NET_CONFIG]
->
->IP = 192.168.144.26
+
+    [NET_CONFIG]
+    IP = 192.168.144.26
 
 
 
