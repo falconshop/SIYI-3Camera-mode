@@ -229,6 +229,65 @@ MediaMTX는 GStreamer가 영상을 '푸시(보내기)'하고, 지상제어스테
 
     chmod +x ~/start_video_merge.sh
 
+## 4. 대기(Standby) 서비스
+이 스크립트는 카메라의 물리적 연결 상태와 무관하게 항상 실행되는 가상의 대기 비디오 스트림(Dummy Stream)을 생성하는 독립적인 백그라운드 프로세스입니다.
+소프트웨어 엔지니어링 관점에서 이 스크립트의 핵심 목적은 클라이언트(SIYI FPV 앱)의 **TCP 소켓 연결이 끊어지는 것을 방지(Keep-alive)**하는 것입니다.
+
+    nano ~/standby_video.sh
+
+소스:
+
+    #!/bin/bash
+    /usr/bin/gst-launch-1.0 -v \
+    videotestsrc pattern=black is-live=true ! \
+    video/x-raw,width=1280,height=480,framerate=15/1 ! \
+    textoverlay text='Waiting for Cameras...' valignment=center halignment=center font-desc='Sans 32' ! \
+    videoconvert ! \
+    v4l2h264enc extra-controls='controls,video_bitrate=1200000,h264_i_frame_period=15' ! \
+    'video/x-h264,level=(string)4,profile=baseline' ! \
+    h264parse config-interval=1 ! \
+    rtspclientsink location=rtsp://127.0.0.1:8554/standby protocols=tcp
+
+실행 가능하게 설정:
+
+    chmod +x ~/standby_video.sh
+
+대기 Systemd 서비스 생성하기
+
+    sudo nano /etc/systemd/system/video-standby.service
+
+내용:
+
+    [Unit]
+    Description=Always-On Standby Video Stream
+    After=mediamtx.service
+    
+    [Service]
+    Type=simple
+    User=pi
+    ExecStart=/bin/bash /home/pi/standby_video.sh
+    Restart=always
+    RestartSec=2
+    
+    [Install]
+    WantedBy=multi-user.target
+
+MediaMTX 폴백(Fallback) 설정하기.
+MediaMTX 설정 파일(mediamtx.yml)을 엽니다. 아래로 스크롤하여 paths: 섹션을 찾은 후, 해당 부분을 아래와 정확히 일치하도록 수정하십시오:
+
+    paths:
+      standby:
+          # 대기용(standby) 영상 소스 경로 설정
+      main.264:
+        # 메인 영상(main.264) 중단 시, 끊김 없이 대기 영상으로 자동 전환
+        fallback: /standby
+
+
+파일을 저장한 후 MediaMTX를 재시작합니다:
+
+    sudo systemctl restart mediamtx.service
+    
+
 ## 4. 자동화 설정 (Systemd)
 이 설정은 부팅 시 모든 프로세스가 자동으로 시작되도록 하며, 예기치 않은 오류로 프로세스가 중단될 경우 자동으로 재시작되도록 보장합니다.
 
