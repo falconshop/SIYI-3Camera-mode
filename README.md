@@ -228,8 +228,45 @@ MediaMTX는 GStreamer가 영상을 '푸시(보내기)'하고, 지상제어스테
 실행 가능하게 설정:
 
     chmod +x ~/start_video_merge.sh
+    
 
-## 4. 대기(Standby) 서비스
+## 4. 자동화 설정 (Systemd)
+이 설정은 부팅 시 모든 프로세스가 자동으로 시작되도록 하며, 예기치 않은 오류로 프로세스가 중단될 경우 자동으로 재시작되도록 보장합니다.
+
+A. MediaMTX Service
+
+    sudo nano /etc/systemd/system/mediamtx.service
+
+내용:
+
+    Description=MediaMTX RTSP Server
+    After=network-online.target
+    [Service]
+    User=pi
+    WorkingDirectory=/home/pi/mediamtx
+    ExecStart=/home/pi/mediamtx/mediamtx
+    Restart=always
+    [Install]
+    WantedBy=multi-user.target
+
+B. Video Merge Service
+
+    sudo nano /etc/systemd/system/video-merge.service
+
+소스:
+
+    Description=GStreamer Merge Service
+    After=mediamtx.service
+    Requires=mediamtx.service
+    [Service]
+    User=pi
+    ExecStart=/home/pi/start_video_merge.sh
+    Restart=always
+    RestartSec=5
+    [Install]
+    WantedBy=multi-user.target
+
+## 5. 대기(Standby) 서비스
 이 스크립트는 카메라의 물리적 연결 상태와 무관하게 항상 실행되는 가상의 대기 비디오 스트림(Dummy Stream)을 생성하는 독립적인 백그라운드 프로세스입니다.
 소프트웨어 엔지니어링 관점에서 이 스크립트의 핵심 목적은 클라이언트(SIYI FPV 앱)의 **TCP 소켓 연결이 끊어지는 것을 방지(Keep-alive)**하는 것입니다.
 
@@ -287,44 +324,7 @@ MediaMTX 설정 파일(mediamtx.yml)을 엽니다. 아래로 스크롤하여 pat
 
     sudo systemctl restart mediamtx.service
     
-
-## 4. 자동화 설정 (Systemd)
-이 설정은 부팅 시 모든 프로세스가 자동으로 시작되도록 하며, 예기치 않은 오류로 프로세스가 중단될 경우 자동으로 재시작되도록 보장합니다.
-
-A. MediaMTX Service
-
-    sudo nano /etc/systemd/system/mediamtx.service
-
-내용:
-
-    Description=MediaMTX RTSP Server
-    After=network-online.target
-    [Service]
-    User=pi
-    WorkingDirectory=/home/pi/mediamtx
-    ExecStart=/home/pi/mediamtx/mediamtx
-    Restart=always
-    [Install]
-    WantedBy=multi-user.target
-
-B. Video Merge Service
-
-    sudo nano /etc/systemd/system/video-merge.service
-
-소스:
-
-    Description=GStreamer Merge Service
-    After=mediamtx.service
-    Requires=mediamtx.service
-    [Service]
-    User=pi
-    ExecStart=/home/pi/start_video_merge.sh
-    Restart=always
-    RestartSec=5
-    [Install]
-    WantedBy=multi-user.target
-    
-## 4. 라즈베리 파이 네트워크 설정
+## 6. 라즈베리 파이 네트워크 설정
 이더넷 케이블(라우터)을 연결했을 때 라즈베리 파이의 Wi-Fi 연결이 끊기는 것을 방지하려면, 이더넷 포트에 고정 IP를 할당하고 네트워크 우선순위를 Wi-Fi보다 낮게 설정해야 합니다.
 
     sudo nano /etc/dhcpcd.conf
@@ -361,6 +361,8 @@ B. Video Merge Service
     sudo systemctl enable eth-retry.service
     sudo systemctl enable mediamtx.service
     sudo systemctl enable video-merge.service
+    sudo systemctl enable video-standby.service
+    sudo systemctl start video-standby.service
     sudo systemctl start mediamtx.service
 
 ## 문제 해결
